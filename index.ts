@@ -1,10 +1,11 @@
 import { Client, LogLevel } from "@notionhq/client";
-import * as fs from 'fs'
-import * as path from 'path'
-import { markdownToBlocks } from '@tryfabric/martian'
-type BlockObjectRequest = ReturnType<typeof markdownToBlocks>[number]
+import * as fs from "fs";
+import * as path from "path";
+import { markdownToBlocks } from "@tryfabric/martian";
+import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+type BlockObjectRequest = ReturnType<typeof markdownToBlocks>[number];
 
-const databaseId = process.env.DATABASE_ID
+const databaseId = process.env.DATABASE_ID;
 
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
@@ -13,36 +14,90 @@ const notion = new Client({
 
 async function sync() {
   if (databaseId == undefined) {
-    console.log("env DATABASE_ID is undefined")
-    return
+    console.log("env DATABASE_ID is undefined");
+    return;
   }
 
-  const filePath = "example/example1.md"
-  const fp = path.join('./', filePath)
-  const fn = path.basename(filePath)
-  console.log(fp)
+  const syncDir = "example";
+  const sd = path.join("./", syncDir);
+  console.log(sd);
 
-  const mdFile = fs.readFileSync(fp, { encoding: 'utf-8' })
-  console.log(mdFile)
-  const blocks = markdownToBlocks(mdFile)
+  const mdFileNames = fs.readdirSync(sd, { encoding: "utf-8" });
+  console.log(mdFileNames);
 
-  const res = await createPage(databaseId, fn, blocks)
-  console.log(res)
+  for (const fileName of mdFileNames) {
+    const fp = path.join("./", sd, "/", fileName);
+    console.log(fp);
+
+    const page = await retrievePage(databaseId, fileName)
+    console.log(page)
+
+    // Create page when the page is not exists
+    if (page.results.length === 0) {
+      console.log(`${fp} is not exists`)
+      const mdContent = fs.readFileSync(fp, { encoding: "utf-8" });
+      const blocks = markdownToBlocks(mdContent);
+      const res = await createPage(databaseId, fileName, blocks);
+      console.log(res)
+
+    // Archive and re-create a page when the page is exists
+    } else {
+      const notionPage = page.results[0] as PageObjectResponse
+      const fileStat = fs.statSync(fp)
+      console.log(notionPage.created_time)
+      console.log(fileStat.ctime)
+      if (fileStat.ctime.getTime() > Date.parse(notionPage.created_time)) {
+        await archivePage(notionPage.id)
+
+        const mdContent = fs.readFileSync(fp, { encoding: "utf-8" });
+        const blocks = markdownToBlocks(mdContent);
+        const res = await createPage(databaseId, fileName, blocks);
+        console.log(res)
+      }
+    }
+  }
 }
 
-async function createPage(databaseId: string, title: string, blocks: BlockObjectRequest[]) {
+async function createPage(
+  databaseId: string,
+  title: string,
+  blocks: BlockObjectRequest[]
+) {
   const props = {
     Name: {
       title: [{ text: { content: title } }],
     },
-  }
+  };
   const res = notion.pages.create({
     parent: { database_id: databaseId },
     properties: props,
     children: blocks,
-  })
+  });
 
-  return res
+  return res;
 }
 
-sync()
+async function retrievePage(databaseId: string, fileName: string) {
+  return notion.databases.query({
+    database_id: databaseId,
+    filter: {
+      and: [
+        {
+          property: "Name",
+          title: {
+            equals: fileName,
+          },
+        },
+      ],
+    },
+  });
+}
+
+async function archivePage(pageId: string) {
+  return notion.pages.update({
+    page_id: pageId,
+    archived: true
+  });
+}
+
+sync();

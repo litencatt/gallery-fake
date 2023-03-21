@@ -1,8 +1,6 @@
-# example1
+# example2
 
 ## h2
-
-適当な文章
 
 ### h3
 
