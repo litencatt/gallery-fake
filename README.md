@@ -1,6 +1,6 @@
 # Gallery Fake
 
-Clone docs to other service
+Sync GitHub markdown docs to Notion DB
 
 ### Usage
 ```yml
