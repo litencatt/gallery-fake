@@ -6,6 +6,7 @@ import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 type BlockObjectRequest = ReturnType<typeof markdownToBlocks>[number];
 
 const databaseId = process.env.DATABASE_ID;
+const mdPath = process.env.MD_PATH;
 
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
@@ -18,8 +19,12 @@ async function sync() {
     return;
   }
 
-  const syncDir = "example";
-  const sd = path.join("./", syncDir);
+  if (mdPath == undefined) {
+    console.log("env MD_PATH is undefined");
+    return;
+  }
+
+  const sd = path.join("./", mdPath);
   console.log(sd);
 
   const mdFileNames = fs.readdirSync(sd, { encoding: "utf-8" });
