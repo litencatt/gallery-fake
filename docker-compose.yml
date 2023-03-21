@@ -3,8 +3,9 @@ services:
   app:
     image: node:latest
     environment:
+      TZ: Asia/Tokyo
       NOTION_TOKEN: $NOTION_TOKEN
-      GITHUB_TOKEN: $GITHUB_TOKEN
+      DATABASE_ID: $DATABASE_ID
     volumes:
       - .:/app
     working_dir: /app

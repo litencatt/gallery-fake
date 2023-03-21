@@ -1,17 +1,19 @@
 {
   "name": "gallery-fake",
   "version": "0.1.0",
-  "description": "Clone GitHub markdown docs to Notion DB",
-  "main": "index.ts",
+  "description": "Sync GitHub markdown docs to Notion DB",
+  "main": "src/index.ts",
   "repository": "ssh://git@github.com/litencatt/gallery-fake.git",
   "author": "litencatt <ncl0709@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "ts-node ./src/index.ts"
+  },
   "dependencies": {
     "@notionhq/client": "^2.2.3",
     "@tryfabric/martian": "^1.2.4",
     "dotenv": "^16.0.3",
     "js-yaml": "^4.1.0",
-    "octokit": "^2.0.14",
     "ts-node": "^10.9.1",
     "typescript": "*"
   },
