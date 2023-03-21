@@ -24,11 +24,19 @@ async function sync() {
     return;
   }
 
-  const mdFileNames = fs.readdirSync(mdPath, { encoding: "utf-8" });
+  let sd = ""
+  if (process.env.GITHUB_ACTIONS) {
+    sd = mdPath
+  } else {
+    sd = path.join("./", mdPath);
+  }
+  console.log(sd);
+
+  const mdFileNames = fs.readdirSync(sd, { encoding: "utf-8" });
   console.log(mdFileNames);
 
   for (const fileName of mdFileNames) {
-    const fp = path.join(mdPath, "/", fileName);
+    const fp = path.join(sd, "/", fileName);
     console.log(fp);
 
     const page = await retrievePage(databaseId, fileName)

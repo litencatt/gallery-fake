@@ -18,4 +18,4 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-          MD_PATH: "example"
+          MD_PATH: "${{ github.workspace }}/example"
