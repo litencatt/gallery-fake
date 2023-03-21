@@ -24,7 +24,7 @@ async function sync() {
     return;
   }
 
-  const sd = path.join("./", mdPath);
+  const sd = path.join("/", mdPath);
   console.log(sd);
 
   const mdFileNames = fs.readdirSync(sd, { encoding: "utf-8" });
