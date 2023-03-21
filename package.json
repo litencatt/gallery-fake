@@ -6,6 +6,9 @@
   "repository": "ssh://git@github.com/litencatt/gallery-fake.git",
   "author": "litencatt <ncl0709@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "ts-node ./index.ts"
+  },
   "dependencies": {
     "@notionhq/client": "^2.2.3",
     "@tryfabric/martian": "^1.2.4",
