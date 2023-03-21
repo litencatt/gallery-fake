@@ -17,5 +17,5 @@ jobs:
         uses: ./.github/actions/gallery-fake
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          DATABASE_ID: ${{ secrets.DATABASE_ID }}
           MD_PATH: "${{ github.workspace }}/example"
