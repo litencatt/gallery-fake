@@ -10,4 +10,6 @@ RUN cd /app && \
     yarn config set unsafe-perm true && \
     yarn install --force
 
+RUN pwd && ls -l
+
 CMD cd /app && yarn start
