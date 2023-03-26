@@ -6,6 +6,7 @@ services:
       TZ: Asia/Tokyo
       NOTION_API_TOKEN: $NOTION_TOKEN
       NOTION_DB_ID: $DATABASE_ID
+      GITHUB_REPOSITORY: $GITHUB_REPOSITORY
     volumes:
       - .:/app
     working_dir: /app
