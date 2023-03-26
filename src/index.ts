@@ -7,6 +7,7 @@ type BlockObjectRequest = ReturnType<typeof markdownToBlocks>[number];
 
 const databaseId = process.env.NOTION_DB_ID;
 const mdPath = process.env.GITHUB_MD_PATH;
+const githubRepo = process.env.GITHUB_REPOSITORY;
 
 const notion = new Client({
   auth: process.env.NOTION_API_TOKEN,
@@ -35,6 +36,8 @@ async function sync() {
   const mdFileNames = fs.readdirSync(sd, { encoding: "utf-8" });
   console.log(mdFileNames);
 
+  const repoUrl = `https://github.com/${githubRepo}`
+
   for (const fileName of mdFileNames) {
     const fp = path.join(sd, "/", fileName);
     console.log(fp);
@@ -42,12 +45,14 @@ async function sync() {
     const page = await retrievePage(databaseId, fileName)
     console.log(page)
 
+    const fileUrl = `${repoUrl}/blob/main/${mdPath}/${fileName}`
+
     // Create page when the page is not exists
     if (page.results.length === 0) {
       console.log(`${fp} is not exists`)
       const mdContent = fs.readFileSync(fp, { encoding: "utf-8" });
       const blocks = markdownToBlocks(mdContent);
-      const res = await createPage(databaseId, fileName, blocks);
+      const res = await createPage(databaseId, fileName, fileUrl, blocks);
       console.log(res)
 
     // Archive and re-create a page when the page is exists
@@ -61,7 +66,7 @@ async function sync() {
 
         const mdContent = fs.readFileSync(fp, { encoding: "utf-8" });
         const blocks = markdownToBlocks(mdContent);
-        const res = await createPage(databaseId, fileName, blocks);
+        const res = await createPage(databaseId, fileName, fileUrl, blocks);
         console.log(res)
       }
     }
@@ -71,12 +76,16 @@ async function sync() {
 async function createPage(
   databaseId: string,
   title: string,
+  url: string,
   blocks: BlockObjectRequest[]
 ) {
   const props = {
     Name: {
       title: [{ text: { content: title } }],
     },
+    URL: {
+      url: url
+    }
   };
   const res = notion.pages.create({
     parent: { database_id: databaseId },
