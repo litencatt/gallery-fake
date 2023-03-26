@@ -38,40 +38,39 @@ async function sync() {
   }
   console.log(sd);
 
-  const mdFileNames = fs.readdirSync(sd, { encoding: "utf-8" });
-  console.log(mdFileNames);
+  const mdFilePath = readdirRecursively(mdPath)
+  console.log(mdFilePath);
 
   const repoUrl = `https://github.com/${githubRepo}`
 
-  for (const fileName of mdFileNames) {
-    const fp = path.join(sd, "/", fileName);
-    console.log(fp);
-
-    const page = await retrievePage(databaseId, fileName)
+  for (const filePath of mdFilePath) {
+    const dirName = path.dirname(filePath)
+    const fileName = path.basename(filePath)
+    const page = await retrievePage(databaseId, fileName, dirName)
     console.log(page)
 
-    const fileUrl = `${repoUrl}/blob/main/${mdPath}/${fileName}`
+    const fileUrl = `${repoUrl}/blob/main/${filePath}`
 
     // Create page when the page is not exists
     if (page.results.length === 0) {
-      console.log(`${fp} is not exists`)
-      const mdContent = fs.readFileSync(fp, { encoding: "utf-8" });
+      console.log(`${filePath} is not exists`)
+      const mdContent = fs.readFileSync(filePath, { encoding: "utf-8" });
       const blocks = markdownToBlocks(mdContent);
-      const res = await createPage(databaseId, fileName, fileUrl, blocks);
+      const res = await createPage(databaseId, fileName, dirName, fileUrl, blocks);
       console.log(res)
 
     // Archive and re-create a page when the page is exists
     } else {
       const notionPage = page.results[0] as PageObjectResponse
-      const fileStat = fs.statSync(fp)
+      const fileStat = fs.statSync(filePath)
       console.log(notionPage.created_time)
       console.log(fileStat.ctime)
       if (fileStat.ctime.getTime() > Date.parse(notionPage.created_time)) {
         await archivePage(notionPage.id)
 
-        const mdContent = fs.readFileSync(fp, { encoding: "utf-8" });
+        const mdContent = fs.readFileSync(filePath, { encoding: "utf-8" });
         const blocks = markdownToBlocks(mdContent);
-        const res = await createPage(databaseId, fileName, fileUrl, blocks);
+        const res = await createPage(databaseId, fileName, dirName, fileUrl, blocks);
         console.log(res)
       }
     }
@@ -80,17 +79,19 @@ async function sync() {
 
 async function createPage(
   databaseId: string,
-  title: string,
+  fileName: string,
+  dirName: string,
   url: string,
   blocks: BlockObjectRequest[]
 ) {
   const props = {
     Name: {
-      title: [{ text: { content: title } }],
+      title: [{ text: { content: fileName } }],
     },
-    URL: {
-      url: url
-    }
+    Dir: {
+      select: { name: dirName }
+    },
+    URL: { url: url }
   };
   const res = notion.pages.create({
     parent: { database_id: databaseId },
@@ -101,7 +102,7 @@ async function createPage(
   return res;
 }
 
-async function retrievePage(databaseId: string, fileName: string) {
+async function retrievePage(databaseId: string, fileName: string, dirName: string) {
   return notion.databases.query({
     database_id: databaseId,
     filter: {
@@ -112,6 +113,12 @@ async function retrievePage(databaseId: string, fileName: string) {
             equals: fileName,
           },
         },
+        {
+          property: "Dir",
+          select: {
+            equals: dirName
+          }
+        }
       ],
     },
   });
@@ -123,5 +130,10 @@ async function archivePage(pageId: string) {
     archived: true
   });
 }
+
+const readdirRecursively = (dir: string): string[] =>
+  fs.readdirSync(dir, { withFileTypes: true }).flatMap(dirent =>
+    dirent.isFile() ? [`${dir}/${dirent.name}`] : readdirRecursively(`${dir}/${dirent.name}`)
+  );
 
 sync();
