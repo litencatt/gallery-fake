@@ -6,7 +6,7 @@ Sync GitHub markdown docs to Notion DB
 
 1. Create Notion Integration.
     - https://developers.notion.com/docs/create-a-notion-integration
-1. Set env `NOTION_TOKEN`, `DATABASE_ID`, `MD_PATH` in your GitHub repository.
+1. Set env `NOTION_API_TOKEN`, `NOTION_DB_ID`, `GITHUB_MD_PATH` in your GitHub repository.
    - https://github.com/\<your\>/\<repository\>/settings
 1. Create workflow yaml.
 
@@ -27,15 +27,15 @@ jobs:
       - name: Gallery Fake
         uses: litencatt/gallery-fake@v0.1.1
         env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-          MD_PATH: "${{ github.workspace }}/path/to/sync_dir"
+          NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          GITHUB_MD_PATH: "${{ github.workspace }}/path/to/sync_dir"
 ```
 
 ### Settings example
 Set like this, if you sync [./example](https://github.com/litencatt/gallery-fake/tree/main/example) dir in your repository.
 ```yml
-          MD_PATH: "${{ github.workspace }}/example"
+          GITHUB_MD_PATH: "${{ github.workspace }}/example"
 ```
 Sync like this, after actions executed.
 <img width="1252" alt="image" src="https://user-images.githubusercontent.com/17349045/226583181-64664397-e4c9-4d85-9c6e-4950ca7cce20.png">

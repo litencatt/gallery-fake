@@ -5,22 +5,22 @@ import { markdownToBlocks } from "@tryfabric/martian";
 import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 type BlockObjectRequest = ReturnType<typeof markdownToBlocks>[number];
 
-const databaseId = process.env.DATABASE_ID;
-const mdPath = process.env.MD_PATH;
+const databaseId = process.env.NOTION_DB_ID;
+const mdPath = process.env.GITHUB_MD_PATH;
 
 const notion = new Client({
-  auth: process.env.NOTION_TOKEN,
+  auth: process.env.NOTION_API_TOKEN,
   logLevel: LogLevel.DEBUG,
 });
 
 async function sync() {
   if (databaseId == undefined) {
-    console.log("env DATABASE_ID is undefined");
+    console.log("env NOTION_DB_ID is undefined");
     return;
   }
 
   if (mdPath == undefined) {
-    console.log("env MD_PATH is undefined");
+    console.log("env GITHUB_MD_PATH is undefined");
     return;
   }
 
