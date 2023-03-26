@@ -15,12 +15,12 @@ const notion = new Client({
 });
 
 async function sync() {
-  if (databaseId == undefined) {
+  if (databaseId === undefined) {
     console.log("env NOTION_DB_ID is undefined");
     return;
   }
 
-  if (mdPath == undefined) {
+  if (mdPath === undefined) {
     console.log("env GITHUB_MD_PATH is undefined");
     return;
   }
@@ -28,7 +28,7 @@ async function sync() {
   let sd = ""
   if (process.env.GITHUB_ACTIONS) {
     const ws = process.env.GITHUB_WORKSPACE
-    if (ws == undefined) {
+    if (ws === undefined) {
       console.log("env GITHUB_WORKSPACE is undefined");
       return;
     }
