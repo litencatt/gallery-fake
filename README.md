@@ -29,13 +29,13 @@ jobs:
         env:
           NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
           NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
-          GITHUB_MD_PATH: "${{ github.workspace }}/path/to/sync_dir"
+          GITHUB_MD_PATH: "path/to/sync_dir"
 ```
 
 ### Settings example
 Set like this, if you sync [./example](https://github.com/litencatt/gallery-fake/tree/main/example) dir in your repository.
 ```yml
-          GITHUB_MD_PATH: "${{ github.workspace }}/example"
+          GITHUB_MD_PATH: "example"
 ```
 Sync like this, after actions executed.
 <img width="1252" alt="image" src="https://user-images.githubusercontent.com/17349045/226583181-64664397-e4c9-4d85-9c6e-4950ca7cce20.png">

@@ -27,7 +27,12 @@ async function sync() {
 
   let sd = ""
   if (process.env.GITHUB_ACTIONS) {
-    sd = mdPath
+    const ws = process.env.GITHUB_WORKSPACE
+    if (ws == undefined) {
+      console.log("env GITHUB_WORKSPACE is undefined");
+      return;
+    }
+    sd = path.join(ws, "/", mdPath);
   } else {
     sd = path.join("./", mdPath);
   }
