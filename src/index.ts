@@ -46,6 +46,13 @@ async function sync() {
   for (const filePath of mdFilePath) {
     const dirName = path.dirname(filePath)
     const fileName = path.basename(filePath)
+    const extName = path.extname(filePath)
+
+    // Sync support ext only .md
+    if (extName !== ".md") {
+      continue
+    }
+
     const page = await retrievePage(databaseId, fileName, dirName)
     console.log(page)
 
