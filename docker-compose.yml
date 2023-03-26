@@ -4,8 +4,8 @@ services:
     image: node:latest
     environment:
       TZ: Asia/Tokyo
-      NOTION_TOKEN: $NOTION_TOKEN
-      DATABASE_ID: $DATABASE_ID
+      NOTION_API_TOKEN: $NOTION_TOKEN
+      NOTION_DB_ID: $DATABASE_ID
     volumes:
       - .:/app
     working_dir: /app
