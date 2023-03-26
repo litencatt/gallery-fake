@@ -38,21 +38,22 @@ async function sync() {
   }
   console.log(sd);
 
-  const mdFileList = readdirRecursively(mdPath)
-  console.log(mdFileList);
+  const mdFilePath = readdirRecursively(mdPath)
+  console.log(mdFilePath);
 
   const repoUrl = `https://github.com/${githubRepo}`
 
-  for (const fileName of mdFileList) {
     const page = await retrievePage(databaseId, fileName)
+  for (const filePath of mdFilePath) {
+    const fileName = path.basename(filePath)
     console.log(page)
 
-    const fileUrl = `${repoUrl}/blob/main/${fileName}`
+    const fileUrl = `${repoUrl}/blob/main/${filePath}`
 
     // Create page when the page is not exists
     if (page.results.length === 0) {
-      console.log(`${fileName} is not exists`)
-      const mdContent = fs.readFileSync(fileName, { encoding: "utf-8" });
+      console.log(`${filePath} is not exists`)
+      const mdContent = fs.readFileSync(filePath, { encoding: "utf-8" });
       const blocks = markdownToBlocks(mdContent);
       const res = await createPage(databaseId, fileName, fileUrl, blocks);
       console.log(res)
@@ -60,13 +61,13 @@ async function sync() {
     // Archive and re-create a page when the page is exists
     } else {
       const notionPage = page.results[0] as PageObjectResponse
-      const fileStat = fs.statSync(fileName)
+      const fileStat = fs.statSync(filePath)
       console.log(notionPage.created_time)
       console.log(fileStat.ctime)
       if (fileStat.ctime.getTime() > Date.parse(notionPage.created_time)) {
         await archivePage(notionPage.id)
 
-        const mdContent = fs.readFileSync(fileName, { encoding: "utf-8" });
+        const mdContent = fs.readFileSync(filePath, { encoding: "utf-8" });
         const blocks = markdownToBlocks(mdContent);
         const res = await createPage(databaseId, fileName, fileUrl, blocks);
         console.log(res)
