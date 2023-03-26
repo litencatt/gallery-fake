@@ -43,9 +43,10 @@ async function sync() {
 
   const repoUrl = `https://github.com/${githubRepo}`
 
-    const page = await retrievePage(databaseId, fileName)
   for (const filePath of mdFilePath) {
+    const dirName = path.dirname(filePath)
     const fileName = path.basename(filePath)
+    const page = await retrievePage(databaseId, fileName, dirName)
     console.log(page)
 
     const fileUrl = `${repoUrl}/blob/main/${filePath}`
@@ -55,7 +56,7 @@ async function sync() {
       console.log(`${filePath} is not exists`)
       const mdContent = fs.readFileSync(filePath, { encoding: "utf-8" });
       const blocks = markdownToBlocks(mdContent);
-      const res = await createPage(databaseId, fileName, fileUrl, blocks);
+      const res = await createPage(databaseId, fileName, dirName, fileUrl, blocks);
       console.log(res)
 
     // Archive and re-create a page when the page is exists
@@ -69,7 +70,7 @@ async function sync() {
 
         const mdContent = fs.readFileSync(filePath, { encoding: "utf-8" });
         const blocks = markdownToBlocks(mdContent);
-        const res = await createPage(databaseId, fileName, fileUrl, blocks);
+        const res = await createPage(databaseId, fileName, dirName, fileUrl, blocks);
         console.log(res)
       }
     }
@@ -78,17 +79,19 @@ async function sync() {
 
 async function createPage(
   databaseId: string,
-  title: string,
+  fileName: string,
+  dirName: string,
   url: string,
   blocks: BlockObjectRequest[]
 ) {
   const props = {
     Name: {
-      title: [{ text: { content: title } }],
+      title: [{ text: { content: fileName } }],
     },
-    URL: {
-      url: url
-    }
+    Dir: {
+      select: { name: dirName }
+    },
+    URL: { url: url }
   };
   const res = notion.pages.create({
     parent: { database_id: databaseId },
@@ -99,7 +102,7 @@ async function createPage(
   return res;
 }
 
-async function retrievePage(databaseId: string, fileName: string) {
+async function retrievePage(databaseId: string, fileName: string, dirName: string) {
   return notion.databases.query({
     database_id: databaseId,
     filter: {
@@ -110,6 +113,12 @@ async function retrievePage(databaseId: string, fileName: string) {
             equals: fileName,
           },
         },
+        {
+          property: "Dir",
+          select: {
+            equals: dirName
+          }
+        }
       ],
     },
   });
