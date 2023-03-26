@@ -8,6 +8,7 @@ type BlockObjectRequest = ReturnType<typeof markdownToBlocks>[number];
 const databaseId = process.env.NOTION_DB_ID;
 const mdPath = process.env.GITHUB_MD_PATH;
 const githubRepo = process.env.GITHUB_REPOSITORY;
+const ws = process.env.GITHUB_WORKSPACE
 
 const notion = new Client({
   auth: process.env.NOTION_API_TOKEN,
@@ -38,13 +39,16 @@ async function sync() {
   }
   console.log(docRootPath);
 
-  const mdFilePath = readdirRecursively(docRootPath)
-  console.log(mdFilePath);
+  const mdFileList = readdirRecursively(docRootPath)
+  console.log(mdFileList);
 
   const repoUrl = `https://github.com/${githubRepo}`
 
-  for (const filePath of mdFilePath) {
-    const dirName = path.dirname(filePath)
+  for (const filePath of mdFileList) {
+    let dirName = path.dirname(filePath)
+    if (process.env.GITHUB_ACTIONS && ws !== undefined) {
+      dirName = dirName.replace(new RegExp(ws + "/"), "")
+    }
     const fileName = path.basename(filePath)
     const extName = path.extname(filePath)
 
