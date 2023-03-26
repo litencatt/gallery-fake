@@ -25,20 +25,20 @@ async function sync() {
     return;
   }
 
-  let sd = ""
+  let docRootPath = ""
   if (process.env.GITHUB_ACTIONS) {
     const ws = process.env.GITHUB_WORKSPACE
     if (ws == undefined) {
       console.log("env GITHUB_WORKSPACE is undefined");
       return;
     }
-    sd = path.join(ws, "/", mdPath);
+    docRootPath = path.join(ws, "/", mdPath);
   } else {
-    sd = path.join("./", mdPath);
+    docRootPath = path.join("./", mdPath);
   }
-  console.log(sd);
+  console.log(docRootPath);
 
-  const mdFilePath = readdirRecursively(mdPath)
+  const mdFilePath = readdirRecursively(docRootPath)
   console.log(mdFilePath);
 
   const repoUrl = `https://github.com/${githubRepo}`
