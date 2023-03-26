@@ -38,24 +38,21 @@ async function sync() {
   }
   console.log(sd);
 
-  const mdFileNames = fs.readdirSync(sd, { encoding: "utf-8" });
-  console.log(mdFileNames);
+  const mdFileList = readdirRecursively(mdPath)
+  console.log(mdFileList);
 
   const repoUrl = `https://github.com/${githubRepo}`
 
-  for (const fileName of mdFileNames) {
-    const fp = path.join(sd, "/", fileName);
-    console.log(fp);
-
+  for (const fileName of mdFileList) {
     const page = await retrievePage(databaseId, fileName)
     console.log(page)
 
-    const fileUrl = `${repoUrl}/blob/main/${mdPath}/${fileName}`
+    const fileUrl = `${repoUrl}/blob/main/${fileName}`
 
     // Create page when the page is not exists
     if (page.results.length === 0) {
-      console.log(`${fp} is not exists`)
-      const mdContent = fs.readFileSync(fp, { encoding: "utf-8" });
+      console.log(`${fileName} is not exists`)
+      const mdContent = fs.readFileSync(fileName, { encoding: "utf-8" });
       const blocks = markdownToBlocks(mdContent);
       const res = await createPage(databaseId, fileName, fileUrl, blocks);
       console.log(res)
@@ -63,13 +60,13 @@ async function sync() {
     // Archive and re-create a page when the page is exists
     } else {
       const notionPage = page.results[0] as PageObjectResponse
-      const fileStat = fs.statSync(fp)
+      const fileStat = fs.statSync(fileName)
       console.log(notionPage.created_time)
       console.log(fileStat.ctime)
       if (fileStat.ctime.getTime() > Date.parse(notionPage.created_time)) {
         await archivePage(notionPage.id)
 
-        const mdContent = fs.readFileSync(fp, { encoding: "utf-8" });
+        const mdContent = fs.readFileSync(fileName, { encoding: "utf-8" });
         const blocks = markdownToBlocks(mdContent);
         const res = await createPage(databaseId, fileName, fileUrl, blocks);
         console.log(res)
@@ -123,5 +120,10 @@ async function archivePage(pageId: string) {
     archived: true
   });
 }
+
+const readdirRecursively = (dir: string): string[] =>
+  fs.readdirSync(dir, { withFileTypes: true }).flatMap(dirent =>
+    dirent.isFile() ? [`${dir}/${dirent.name}`] : readdirRecursively(`${dir}/${dirent.name}`)
+  );
 
 sync();
