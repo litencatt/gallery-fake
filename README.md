@@ -1,4 +1,6 @@
-<img width="400" src="logo.png" style="display: block; margin: auto;"><br>
+<p align="center">
+   <img width="400" src="logo.png">
+</p>
 
 `Gallery Fake` is a GitHub Actions for sync markdown docs to Notion DB.
 
