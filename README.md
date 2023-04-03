@@ -1,13 +1,13 @@
-# Gallery Fake
+<img width="400" src="logo.png" style="display: block; margin: auto;"><br>
 
-Sync GitHub markdown docs to Notion DB
+`Gallery Fake` is a GitHub Actions for sync markdown docs to Notion DB.
 
 ### Usage
 
 1. Create Notion Integration.
    - https://developers.notion.com/docs/create-a-notion-integration
 1. Set env `NOTION_API_TOKEN`, `NOTION_DB_ID`, `GITHUB_MD_PATH` in your GitHub repository.
-   - https://github.com/\<your\>/\<repository\>/settings
+   - https://github.com/<your\>/<repository\>/settings
 1. Create workflow yaml.
 
 ```yml
@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Gallery Fake
-        uses: litencatt/gallery-fake@v0.1.1
+        uses: litencatt/gallery-fake@v0.4.0
         env:
           NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
           NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
