@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import { markdownToBlocks } from "@tryfabric/martian";
-import { retrievePage, createPage, archivePage } from "./notion";
+import { retrievePage, createPage, updatePage } from "./notion";
 import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
 const databaseId = process.env.NOTION_DB_ID;
@@ -70,25 +70,16 @@ async function sync() {
       );
       console.log(res);
 
-      // Archive and re-create a page when the page is exists
+      // Update a page when the page is exists
     } else {
       const notionPage = page.results[0] as PageObjectResponse;
       const fileStat = fs.statSync(filePath);
-      console.log(notionPage.created_time);
+      console.log(notionPage.last_edited_time);
       console.log(fileStat.ctime);
-      if (fileStat.ctime.getTime() > Date.parse(notionPage.created_time)) {
-        await archivePage(notionPage.id);
-
+      if (fileStat.ctime.getTime() > Date.parse(notionPage.last_edited_time)) {
         const mdContent = fs.readFileSync(filePath, { encoding: "utf-8" });
         const blocks = markdownToBlocks(mdContent);
-        const res = await createPage(
-          databaseId,
-          fileName,
-          dirName,
-          fileUrl,
-          blocks
-        );
-        console.log(res);
+        await updatePage(notionPage.id, blocks);
       }
     }
   }

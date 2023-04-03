@@ -4,7 +4,7 @@ import { markdownToBlocks } from "@tryfabric/martian";
 type BlockObjectRequest = ReturnType<typeof markdownToBlocks>[number];
 
 const notion = new Client({
-  auth: process.env.NOTION_TOKEN,
+  auth: process.env.NOTION_API_TOKEN,
   logLevel: LogLevel.DEBUG,
 });
 
@@ -63,5 +63,26 @@ export const archivePage = async (pageId: string) => {
   return notion.pages.update({
     page_id: pageId,
     archived: true,
+  });
+};
+
+// Update page
+// Delete all blocks in a page and add blocks
+export const updatePage = async (
+  pageId: string,
+  blocks: BlockObjectRequest[]
+) => {
+  const blks = await notion.blocks.children.list({
+    block_id: pageId,
+  });
+  for (const blk of blks.results) {
+    await notion.blocks.delete({
+      block_id: blk.id,
+    });
+  }
+
+  await notion.blocks.children.append({
+    block_id: pageId,
+    children: blocks,
   });
 };
