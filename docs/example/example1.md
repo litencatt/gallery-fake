@@ -17,3 +17,9 @@
 - [ ] checkbox1
 - [ ] checkbox2
 - [ ] checkbox3
+
+### コードブロック
+
+```bash
+cd path/to/foo
+```
