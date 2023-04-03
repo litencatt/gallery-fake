@@ -4,7 +4,7 @@ import { markdownToBlocks } from "@tryfabric/martian";
 type BlockObjectRequest = ReturnType<typeof markdownToBlocks>[number];
 
 const notion = new Client({
-  auth: process.env.NOTION_TOKEN,
+  auth: process.env.NOTION_API_TOKEN,
   logLevel: LogLevel.DEBUG,
 });
 
