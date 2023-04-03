@@ -1,5 +1,5 @@
-name: 'Gallery Fake'
-description: 'Sync markdown files in repository as pages on a specific Notion DB'
+name: "Gallery Fake"
+description: "Sync markdown files in repository as pages on a specific Notion DB"
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: "docker"
+  image: "Dockerfile"
