@@ -74,9 +74,9 @@ async function sync() {
     } else {
       const notionPage = page.results[0] as PageObjectResponse;
       const fileStat = fs.statSync(filePath);
-      console.log(notionPage.created_time);
+      console.log(notionPage.last_edited_time);
       console.log(fileStat.ctime);
-      if (fileStat.ctime.getTime() > Date.parse(notionPage.created_time)) {
+      if (fileStat.ctime.getTime() > Date.parse(notionPage.last_edited_time)) {
         const mdContent = fs.readFileSync(filePath, { encoding: "utf-8" });
         const blocks = markdownToBlocks(mdContent);
         await updatePage(notionPage.id, blocks);
