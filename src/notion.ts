@@ -65,3 +65,24 @@ export const archivePage = async (pageId: string) => {
     archived: true,
   });
 };
+
+// Update page
+// Delete all blocks in a page and add blocks
+export const updatePage = async (
+  pageId: string,
+  blocks: BlockObjectRequest[]
+) => {
+  const blks = await notion.blocks.children.list({
+    block_id: pageId,
+  });
+  for (const blk of blks.results) {
+    await notion.blocks.delete({
+      block_id: blk.id,
+    });
+  }
+
+  await notion.blocks.children.append({
+    block_id: pageId,
+    children: blocks,
+  });
+};
