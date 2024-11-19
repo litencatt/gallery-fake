@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { escapeRegExp } from "lodash";
 import { markdownToBlocks } from "@tryfabric/martian";
 import { retrievePage, createPage, updatePage } from "./notion";
 import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
@@ -41,7 +42,8 @@ async function sync() {
   for (const filePath of mdFileList) {
     let dirName = path.dirname(filePath);
     if (process.env.GITHUB_ACTIONS && ws !== undefined) {
-      dirName = dirName.replace(new RegExp(ws + "/"), "");
+      const safeWs = escapeRegExp(ws);
+      dirName = dirName.replace(new RegExp(safeWs + "/"), "");
     }
     const fileName = path.basename(filePath);
     const extName = path.extname(filePath);
